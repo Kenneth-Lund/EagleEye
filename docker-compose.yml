@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+    test-website-backend:
+        build: ./test-website-backend
+        volumes:
+            - ./test-website-backend:/user/src/app
+        ports:
+            - 5001:80
+
+    test-website-frontend:
+            image: php:apache
+            volumes:
+                - ./test-website-frontend:/var/www/html
+            ports:
+                - 5000:80
+            depends_on:
+                - test-website-backend
+
+    test-eagle-service:
+        build: ./test-eagle
+        volumes:
+            - ./test-eagle:/user/src/app
+        ports:
+            - 5002:80
+        network_mode: host
+        depends_on:
+            - test-website-frontend
+
+    
