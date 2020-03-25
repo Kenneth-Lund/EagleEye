@@ -1,0 +1,7 @@
+-- TEST EAGLE --
+
+Options:
+
+    -r: recursive
+    -a: accept [take in arguements... etc]
+    -s: search
