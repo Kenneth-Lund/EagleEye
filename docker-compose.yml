@@ -1,13 +1,32 @@
 version: '3'
 
 services:
+
+    # Database Container
+    development-db:
+        image: mysql:5.7
+        environment:
+            MYSQL_USER: admin
+            MYSQL_ROOT_PASSWORD: eagle1234
+            MYSQL_DATABASE: EAGLEEYE
+        ports:
+            - 3306:3306
+        # Schema is initialized here
+        volumes:
+            - ./development-db-data:/var/lib/mysql
+            - ./developnebt-db-init:/docker-entrypoint-initdb.d
+    
+    # This container creates a simple API for our test website to present data
     test-website-backend:
         build: ./test-website-backend
         volumes:
             - ./test-website-backend:/user/src/app
         ports:
             - 5001:80
+        depends_on:
+            - development-db
 
+    # Apache hosted test website for scraping
     test-website-frontend:
             image: php:apache
             volumes:
@@ -17,6 +36,7 @@ services:
             depends_on:
                 - test-website-backend
 
+    # Eagle Eye container for testing 
     test-eagle-service:
         build: ./test-eagle
         volumes:
