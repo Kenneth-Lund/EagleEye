@@ -1,9 +1,11 @@
 import requests
-from bs4 import BeautifulSoup as bs
 import time
+import mysql.connector as connector
+from bs4 import BeautifulSoup as bs
 
-if __name__ == "__main__":
-    
+# Scrapes our test website
+def test_scrape():
+
     time.sleep(3)
     try:
 
@@ -18,3 +20,31 @@ if __name__ == "__main__":
     except:
 
         print("unable to reach site")
+
+# Initializes a database connection to our development db container
+def test_db_connection():
+
+    try:
+        cnx = connector.connect(user='root', password='eagle1234', host='localhost', database='EAGLEEYE')
+
+        print("Database Connection Successful")
+
+        return True
+    except:
+
+        return False
+
+    
+
+if __name__ == "__main__":
+
+    # If able to connect to development db, start test scraping
+    if test_db_connection():
+
+        test_scrape()
+    else:
+
+        print("Database connection failed, unable to scrape")
+
+    
+    
