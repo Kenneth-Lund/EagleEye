@@ -10,6 +10,7 @@ Instructions for developers:
 Docker Command Shortcuts:
 
 If you want to see logs:
+
     Start:
         1. docker-compose build (Applies changes to containers/creates)
         2. docker-compose up
@@ -18,6 +19,7 @@ If you want to see logs:
         2. docker-compose down
 
 If you do not want to see logs:
+
     Start:
         1. docker-compose build (Applies changes to containers/creates)
         1. docker-compose up -d
