@@ -41,7 +41,7 @@ def start(parameters):
 
         current_url = url_queue.pop(0)
         
-        print("Currently scrapgin at url: [" + current_url + "] at leve: " + level)
+        print("Currently scraping at url: [" + current_url + "] at leve: " + level)
 
         level+= 1
         
@@ -50,7 +50,7 @@ def start(parameters):
         html = bs(data.text, "html.parser")
 
         # Scrape current html based on parameters
-        scrape_webpate(current_url, parameters, html)
+        scrape_webpage(current_url, parameters, html)
         
         # Add any new urls found from current webpage
         linked_urls = find_neighboring_pages(current_url)
