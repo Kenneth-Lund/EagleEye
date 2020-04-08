@@ -50,4 +50,15 @@ services:
         depends_on:
             - test-website-frontend
 
+    # Eagle Eye container for testing 
+    development-eagle-service:
+        build: ./development-eagle
+        volumes:
+            - ./development-eagle:/user/src/app
+        ports:
+            - 5003:80
+        network_mode: host
+        depends_on:
+            - test-eagle-service
+
     
