@@ -53,6 +53,8 @@ services:
     # Eagle Eye container for testing 
     development-eagle-service:
         build: ./development-eagle
+        container_name: development_eagle
+        command: tail -F anything    
         volumes:
             - ./development-eagle:/user/src/app
         ports:
