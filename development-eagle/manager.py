@@ -13,6 +13,7 @@ def main():
     # parse arguments
     args = parser.parse_args()
 
+    print("url specified is " + args.url)
 
     if args.r == True:
         print('recursive mode enabled')
