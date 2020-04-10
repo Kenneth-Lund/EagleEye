@@ -3,7 +3,9 @@ import argparse
 
 
 def main():
-    print("HELLO WE MADE IT")
+    
+    parameters = {}
+
     parser = argparse.ArgumentParser(description='parser for EagleEye')
     parser.add_argument('--url', action='store')
     
@@ -13,13 +15,15 @@ def main():
     # parse arguments
     args = parser.parse_args()
 
-    print("url specified is " + args.url)
-
     if args.r == True:
-        print('recursive mode enabled')
+        parameters["max_level"] = 10000
     else:
-        print('recursive mode disabled')
+        parameters["max_level"] = 1
 
+    parameters["initial_url"] = args.url
+
+    scraper.scrape(parameters)
+    
 
 if __name__ == "__main__":
     main()

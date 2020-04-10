@@ -7,7 +7,7 @@ api = Api(app)
 class Hidden_Data(Resource):
     def get(self):
         return {
-            'sensitive_data': ['hello world']
+            'sensitive_data': ['Username', 'Password', 'email']
     }
 
 api.add_resource(Hidden_Data, '/get-data')

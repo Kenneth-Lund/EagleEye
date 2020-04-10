@@ -30,12 +30,30 @@ services:
             - development-db
 
     # Apache hosted test website for scraping
-    test-website-frontend:
+    test-website-frontend1:
             image: php:apache
             volumes:
-                - ./test-website-frontend:/var/www/html
+                - ./test-website-containers/test-website-frontend1:/var/www/html
             ports:
                 - 5000:80
+            depends_on:
+                - test-website-backend
+    
+    test-website-frontend2:
+            image: php:apache
+            volumes:
+                - ./test-website-containers/test-website-frontend2:/var/www/html
+            ports:
+                - 5002:80
+            depends_on:
+                - test-website-backend
+    
+    test-website-frontend3:
+            image: php:apache
+            volumes:
+                - ./test-website-containers/test-website-frontend3:/var/www/html
+            ports:
+                - 5003:80
             depends_on:
                 - test-website-backend
 
@@ -45,10 +63,10 @@ services:
         volumes:
             - ./test-eagle:/user/src/app
         ports:
-            - 5002:80
+            - 5004:80
         network_mode: host
         depends_on:
-            - test-website-frontend
+            - test-website-frontend3
 
     # Eagle Eye container for testing 
     development-eagle-service:
@@ -58,7 +76,7 @@ services:
         volumes:
             - ./development-eagle:/user/src/app
         ports:
-            - 5003:80
+            - 5005:80
         network_mode: host
         depends_on:
             - test-eagle-service
