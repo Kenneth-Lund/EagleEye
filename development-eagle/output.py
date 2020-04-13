@@ -7,7 +7,7 @@ the current OS deskptop directory.
 def output_data():
     
     try:
-        cnx = connector.connect(user='root', password='eagle1234', host='localhost', database='EAGLEEYE')
+        cnx = connector.connect(user='test', password='test', host='localhost', database='EAGLEEYE')
     except:
         print("database connection unsuccessful")
         return
