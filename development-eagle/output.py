@@ -17,7 +17,7 @@ def output_data():
 
     # PDF implementation goes here: 
         # try to store the PDF on your desktop after running
-        
+
     '''
     pdf = FPDF()
     pdf.set_font("Arial", size=12)
