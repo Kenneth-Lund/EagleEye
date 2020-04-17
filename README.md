@@ -7,6 +7,12 @@ Coming Soon.
 
 Instructions for developers:
 
+    - ./startup-scripts/start.sh --url http://127.0.0.1:5000 --time 5 --keywords Username
+
+    - url: initial url
+    - time: max time to check a webpage for changes
+    - keywords: a list of keywords you want to search for
+    
 Docker Command Shortcuts:
 
 If you want to see logs:
