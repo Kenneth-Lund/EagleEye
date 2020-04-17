@@ -1,17 +1,16 @@
-version: '3'
+version: '3.3'
 
 services:
 
     # Database Container
     development-db:
         image: mysql:5.7
-        command: --default-authentication-plugin=mysql_native_password
+        restart: always
         environment:
-            MYSQL_ROOT_PASSWORD: eagle1234
+            MYSQL_DATABASE: EAGLEEYE
+            MYSQL_ROOT_PASSWORD: test
             MYSQL_USER: test
             MYSQL_PASSWORD: test
-            MYSQL_DATABASE: EAGLEEYE
-
         ports:
             - 3306:3306
         # Schema is initialized here
@@ -19,6 +18,29 @@ services:
             - ./development-db-data:/var/lib/mysql
             - ./development-db-init/schema.sql:/docker-entrypoint-initdb.d/initdb.sql
     
+    # Eagle Eye container for testing 
+    test-eagle-service:
+        build: ./test-eagle
+        volumes:
+            - ./test-eagle:/user/src/app
+        ports:
+            - 5004:80
+        network_mode: host
+        depends_on:
+            - development-db
+    
+    development-eagle-service:
+        build: ./development-eagle
+        container_name: development_eagle
+        command: tail -f /dev/null
+        volumes:
+            - ./development-eagle:/user/src/app
+        ports:
+            - 5005:80
+        network_mode: host
+        depends_on:
+            - development-db
+
     # This container creates a simple API for our test website to present data
     test-website-backend:
         build: ./test-website-backend
@@ -57,28 +79,8 @@ services:
             depends_on:
                 - test-website-backend
 
-    # Eagle Eye container for testing 
-    test-eagle-service:
-        build: ./test-eagle
-        volumes:
-            - ./test-eagle:/user/src/app
-        ports:
-            - 5004:80
-        network_mode: host
-        depends_on:
-            - test-website-frontend3
+    
 
-    # Eagle Eye container for testing 
-    development-eagle-service:
-        build: ./development-eagle
-        container_name: development_eagle
-        command: tail -F anything 
-        volumes:
-            - ./development-eagle:/user/src/app
-        ports:
-            - 5005:80
-        network_mode: host
-        depends_on:
-            - test-eagle-service
+    
 
     

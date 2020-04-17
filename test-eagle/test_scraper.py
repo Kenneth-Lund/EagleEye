@@ -74,10 +74,10 @@ def find_neighboring_pages(current_url, html):
 def test_db_connection():
 
     try:
+        
         cnx = connector.connect(user='test', password='test', host='localhost', database='EAGLEEYE')
 
-        print("Database Connection Successful")
-
+        cnx.close()
         return True
     except:
 
@@ -86,6 +86,10 @@ def test_db_connection():
     
 if __name__ == "__main__":
 
+    while (test_db_connection() == False):
+        time.sleep(5)
+        print("connecting to db...")
+    
     # If able to connect to development db, start test scraping
     if test_db_connection():
         

@@ -2,11 +2,11 @@ import requests
 import time
 import mysql.connector as connector
 from bs4 import BeautifulSoup as bs
+from selenium import webdriver
+import datetime
 
 # Scrapes our test website
-def scrape(parameters):
-
-    #Initialize database connection
+def scrape(parameters, db_connection):
 
     # First url that will be passed into the queue.
     initial_url = parameters['initial_url']
@@ -32,6 +32,7 @@ def scrape(parameters):
     url_queue.append(initial_url)
     url_visited.append(initial_url)
 
+    # Perform BFS until max level is reached.
     while url_queue and level <= max_level:
 
         current_url = url_queue.pop(0)
@@ -40,37 +41,78 @@ def scrape(parameters):
 
         level+= 1
 
-        # Extract HTML: prevents calling same url for each schema value
-        data = requests.get(current_url)
-        html = bs(data.text, "html.parser")
-
-        # Add any new urls found from current webpage
-        linked_urls = find_neighboring_pages(current_url, html)
+        # Create a driver for the current html to begin scraping
+        scrape_driver(current_url, parameters, url_visited, url_queue, db_connection)
+    
+    # This is where output file gets called, pass the database connection here as well.
+    print("Done scraping")
         
-        for url in linked_urls:
 
-            if url not in url_visited:
 
-                url_queue.append(url)
-                url_visited.append(url)
-        """
-        
-        # Scrape current html based on parameters
-        scrape_webpage(current_url, parameters, html)
-        
-        """
-    print("done scraping")
 
-def scrape_webpage(source, parameters, html):
+def scrape_driver(current_url, parameters, url_visited, url_queue, db_connection):
+    
+    print("Opening driver for: " + current_url)
 
-    print("Scraping url at: " + source)
+    # Step 1. Create driver
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--disable-gpu')
 
+    driver = webdriver.Chrome(chrome_options=chrome_options)
+
+    driver.get(current_url)
+
+    # Step 2. Grab html from current driver
+    original_html = driver.page_source
+
+    count = 0
+
+    # Step 3. Enter while loop and check for changes in HTML until time is up
+    while (count < int(parameters['time'])):
+
+        newer_html = driver.page_source
+
+        if (original_html != newer_html):
+
+            soup_html = bs(newer_html, "html.parser")
+            
+            # Step 4. Scrape the newly found data.
+            scrape_html(current_url, parameters, soup_html, db_connection)
+
+            # Step 5. Check if there are any new urls to enqueue.
+            linked_urls = find_neighboring_pages(current_url, soup_html)
+
+            # Step 6. Update url_queue if any additional neighboring websites are found
+            for url in linked_urls:
+
+                if url not in url_visited:
+
+                    url_queue.append(url)
+                    url_visited.append(url)
+            
+            original_html = newer_html
+
+        # Allow one second between each check
+        count+=1
+        time.sleep(1)
+
+    # Quit driver as we are done scraping this current url
+    driver.quit()
+
+
+def scrape_html(current_url, parameters, soup_html, db_connection):
+
+    find_keywords(current_url, parameters['keywords'], soup_html, db_connection)
+    
+    
 # Finds all embedded urls within an HTML page
-def find_neighboring_pages(current_url, html):
+def find_neighboring_pages(current_url, soup_html):
     
     found_urls = []
 
-    a_tags = html.find_all('a')
+    a_tags = soup_html.find_all('a')
 
     for a_tag in a_tags:
             
@@ -79,6 +121,47 @@ def find_neighboring_pages(current_url, html):
     return found_urls
 
 
+def find_keywords(current_url, keywords, soup_html, db_connection):
 
+    for keyword in keywords:
+
+        if soup_html.findAll(text=keyword):
+
+            data = data_helper(current_url, keyword, "keyword")
+
+            database_insert(data, db_connection)
+
+# Creates a data dictionary for inserting into database  
+def data_helper(current_url, value, value_type):
+
+    data = {
+        'source': current_url,
+        'value':  value,
+        'type': value_type
+    }
+
+    return data
+            
+
+def database_insert(data, db_connection):
+    try:
+        cursor = db_connection.cursor()
+        
+        now = datetime.datetime.now()
+
+        cursor.execute("INSERT INTO data_table(process_id, data_value, data_type, data_source, time_retrieved) values(%s, %s, %s, %s, %s)",
+                   ("1", data['value'], data['type'], data['source'], now))
+        
+        
+        db_connection.commit()
+
+        cursor.close()
+
+        print("data was found... inserting")
+    except:
+        print("data was found... but insertion failed")
+    
+    
+    
 
     
