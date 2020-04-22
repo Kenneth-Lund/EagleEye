@@ -34,7 +34,7 @@ def scrape(parameters, db_connection):
 
     # Perform BFS until max level is reached.
     while url_queue and level <= max_level:
-
+        
         current_url = url_queue.pop(0)
         
         print("Currently scraping at url: [" + current_url + "] at level: " + str(level))
@@ -47,8 +47,6 @@ def scrape(parameters, db_connection):
     # This is where output file gets called, pass the database connection here as well.
     print("Done scraping")
         
-
-
 
 def scrape_driver(current_url, parameters, url_visited, url_queue, db_connection):
     
@@ -64,33 +62,32 @@ def scrape_driver(current_url, parameters, url_visited, url_queue, db_connection
 
     driver.get(current_url)
 
-    # Step 2. Grab html from current driver
+    # Step 2. Scrape html from current driver before looking for any dynamic changes
     original_html = driver.page_source
 
-    count = 0
+    original_soup = bs(original_html, "html.parser")
+
+    scrape_html(current_url, parameters, original_soup, db_connection)
+    
+    add_neighboring_pages(current_url, original_soup, url_visited, url_queue)
 
     # Step 3. Enter while loop and check for changes in HTML until time is up
+    count = 0
+
     while (count < int(parameters['time'])):
+
+        print("Searching for any dynamic webpage change at this url..." + str(count + 1))
 
         newer_html = driver.page_source
 
         if (original_html != newer_html):
 
-            soup_html = bs(newer_html, "html.parser")
+            # Step 4. Scrape the newly found dynamic data.
+            new_soup = bs(newer_html, "html.parser")
             
-            # Step 4. Scrape the newly found data.
-            scrape_html(current_url, parameters, soup_html, db_connection)
-
-            # Step 5. Check if there are any new urls to enqueue.
-            linked_urls = find_neighboring_pages(current_url, soup_html)
-
-            # Step 6. Update url_queue if any additional neighboring websites are found
-            for url in linked_urls:
-
-                if url not in url_visited:
-
-                    url_queue.append(url)
-                    url_visited.append(url)
+            scrape_html(current_url, parameters, new_soup, newer_html, db_connection)
+            
+            add_neighboring_pages(current_url, new_soup, url_visited, url_queue)
             
             original_html = newer_html
 
@@ -101,12 +98,22 @@ def scrape_driver(current_url, parameters, url_visited, url_queue, db_connection
     # Quit driver as we are done scraping this current url
     driver.quit()
 
-
-def scrape_html(current_url, parameters, soup_html, db_connection):
-
-    find_keywords(current_url, parameters['keywords'], soup_html, db_connection)
+# Adds new urls that have not been visited before to the queue
+def add_neighboring_pages(current_url, soup_html, url_visited, url_queue):
     
-    
+    linked_urls = find_neighboring_pages(current_url, soup_html)
+
+    # Update url_queue if any additional neighboring websites are found
+    for url in linked_urls:
+
+        if url not in url_visited:
+            
+            print("Found new url at: " + current_url)
+
+            url_queue.append(url)
+            url_visited.append(url)
+
+
 # Finds all embedded urls within an HTML page
 def find_neighboring_pages(current_url, soup_html):
     
@@ -114,13 +121,24 @@ def find_neighboring_pages(current_url, soup_html):
 
     a_tags = soup_html.find_all('a')
 
-    for a_tag in a_tags:
-            
+    for a_tag in a_tags:   
         found_urls.append(a_tag.get('href'))
     
     return found_urls
 
 
+def scrape_html(current_url, parameters, soup_html, newer_html, db_connection):
+
+    find_keywords(current_url, parameters['keywords'], soup_html, db_connection)
+
+    if parameters['phone']:
+        find_phone(current_url, newer_html, db_connection)
+
+    if parameters['social']:
+        find_social(current_url, newer_html, db_connection)
+
+    
+    
 def find_keywords(current_url, keywords, soup_html, db_connection):
 
     for keyword in keywords:
@@ -130,6 +148,17 @@ def find_keywords(current_url, keywords, soup_html, db_connection):
             data = data_helper(current_url, keyword, "keyword")
 
             database_insert(data, db_connection)
+
+
+def find_social(current_url, newer_html, db_connection):
+
+    print("finding social")
+
+def find_phone(current_url, newer_html, db_connection):
+
+    print("finding phone number")
+
+
 
 # Creates a data dictionary for inserting into database  
 def data_helper(current_url, value, value_type):
@@ -150,14 +179,14 @@ def database_insert(data, db_connection):
         now = datetime.datetime.now()
 
         cursor.execute("INSERT INTO data_table(process_id, data_value, data_type, data_source, time_retrieved) values(%s, %s, %s, %s, %s)",
-                   ("1", data['value'], data['type'], data['source'], now))
+                   ("417", data['value'], data['type'], data['source'], now))
         
         
         db_connection.commit()
 
         cursor.close()
 
-        print("data was found... inserting")
+        print("DATA FOUND... inserting into DB.")
     except:
         print("data was found... but insertion failed")
     
