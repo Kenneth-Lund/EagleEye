@@ -46,6 +46,9 @@ def scrape(parameters, db_connection):
     
     # This is where output file gets called, pass the database connection here as well.
     print("Done scraping")
+
+    print("Calling output function for PDF gen")
+    output.output_data(db_connection)
         
 
 def scrape_driver(current_url, parameters, url_visited, url_queue, db_connection):
