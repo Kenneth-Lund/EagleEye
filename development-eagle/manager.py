@@ -13,10 +13,14 @@ def main():
     # Allocated time a website will be scraped for
     parser.add_argument('--time', action='store')
 
-    parser.add_argument('--keywords', action='append')
+    parser.add_argument('--keywords', nargs = '+', default =[])
     
     # store_true will set default to false. if -r is specified, default will change to true
     parser.add_argument('-r', action='store_true') 
+
+    parser.add_argument('-p', action='store_true') 
+    parser.add_argument('-s', action='store_true') 
+    parser.add_argument('-e', action='store_true') 
 
     # parse arguments
     args = parser.parse_args()
@@ -25,6 +29,21 @@ def main():
         parameters["max_level"] = 10000
     else:
         parameters["max_level"] = 1
+
+    if args.e == True:
+        parameters["email"] = True
+    else:
+        parameters["email"] = False
+
+    if args.p == True:
+        parameters["phone"] = True
+    else:
+        parameters["Phone"] = False
+
+    if args.s == True:
+        parameters["social"] = True
+    else:
+        parameters["social"] = False
     
     parameters["time"] = args.time
     parameters["initial_url"] = args.url
@@ -40,6 +59,7 @@ def start(parameters):
 
         scraper.scrape(parameters, db_connection)
 
+        db_connection.close()
     except:
 
         time.sleep(5)

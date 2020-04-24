@@ -4,6 +4,8 @@ import mysql.connector as connector
 from bs4 import BeautifulSoup as bs
 from selenium import webdriver
 import datetime
+import re
+import output
 
 # Scrapes our test website
 def scrape(parameters, db_connection):
@@ -70,7 +72,7 @@ def scrape_driver(current_url, parameters, url_visited, url_queue, db_connection
 
     original_soup = bs(original_html, "html.parser")
 
-    scrape_html(current_url, parameters, original_soup, db_connection)
+    scrape_html(current_url, parameters, original_soup, original_html, db_connection)
     
     add_neighboring_pages(current_url, original_soup, url_visited, url_queue)
 
@@ -98,8 +100,12 @@ def scrape_driver(current_url, parameters, url_visited, url_queue, db_connection
         count+=1
         time.sleep(1)
 
+        # Refresh the driver
+        driver.refresh()
+
     # Quit driver as we are done scraping this current url
     driver.quit()
+
 
 # Adds new urls that have not been visited before to the queue
 def add_neighboring_pages(current_url, soup_html, url_visited, url_queue):
@@ -132,7 +138,8 @@ def find_neighboring_pages(current_url, soup_html):
 
 def scrape_html(current_url, parameters, soup_html, newer_html, db_connection):
 
-    find_keywords(current_url, parameters['keywords'], soup_html, db_connection)
+    for keyword in parameters['keywords']:
+        find_keyword(current_url, keyword, newer_html, db_connection)
 
     if parameters['phone']:
         find_phone(current_url, newer_html, db_connection)
@@ -140,41 +147,59 @@ def scrape_html(current_url, parameters, soup_html, newer_html, db_connection):
     if parameters['social']:
         find_social(current_url, newer_html, db_connection)
 
-    
-    
-def find_keywords(current_url, keywords, soup_html, db_connection):
+    if parameters['email']:
+        find_email(current_url, newer_html, db_connection)
 
-    for keyword in keywords:
 
-        if soup_html.findAll(text=keyword):
+def find_keyword(current_url, keyword, newer_html, db_connection):
 
-            data = data_helper(current_url, keyword, "keyword")
+    # ignore case sensitive
+    if keyword.lower() in newer_html.lower():
 
-            database_insert(data, db_connection)
+        data_insertion_helper(current_url, [keyword], "KEYWORD", db_connection)
 
 
 def find_social(current_url, newer_html, db_connection):
 
-    print("finding social")
+    socials = re.findall(r'\b(?!000|.+0{4})(?:\d{9}|\d{3}-\d{2}-\d{4})\b', newer_html)
+
+    if len(socials) > 0:
+
+        data_insertion_helper(current_url, socials, "SSN", db_connection)
+   
 
 def find_phone(current_url, newer_html, db_connection):
 
-    print("finding phone number")
+    phone_numbers = re.findall(r'\d{3}[-\.\s]??\d{3}[-\.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-\.\s]??\d{4}|\d{3}[-\.\s]??\d{4}', newer_html)
+  
+    if len(phone_numbers) > 0:
+
+        data_insertion_helper(current_url, phone_numbers, "Phone", db_connection)
+
+def find_email(current_url, newer_html, db_connection):
+
+    emails = re.findall(r'[a-zA-Z0-9+._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+', newer_html)
+
+    if len(emails) > 0:
+
+        data_insertion_helper(current_url, emails, "Email", db_connection)
 
 
 
 # Creates a data dictionary for inserting into database  
-def data_helper(current_url, value, value_type):
+def data_insertion_helper(current_url, value_list, value_type, db_connection):
 
-    data = {
-        'source': current_url,
-        'value':  value,
-        'type': value_type
-    }
+    for value in value_list:
+        
+        data = {
+            'source': current_url,
+            'value':  value,
+            'type': value_type
+        }
 
-    return data
+        database_insert(data, db_connection)
+
             
-
 def database_insert(data, db_connection):
     try:
         cursor = db_connection.cursor()

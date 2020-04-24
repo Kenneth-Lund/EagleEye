@@ -1,7 +1,7 @@
 CREATE TABLE processes (
     process_id INT PRIMARY KEY,
     data_count int,
-    time_started DATE
+    time_started DATETIME
 );
 
 CREATE TABLE data_table
@@ -11,5 +11,5 @@ CREATE TABLE data_table
   data_value VARCHAR(500),
   data_type VARCHAR(500),
   data_source VARCHAR(500),
-  time_retrieved DATE
+  time_retrieved DATETIME
 );
