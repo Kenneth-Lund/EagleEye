@@ -53,18 +53,25 @@ Debugging documentation:
 
         docker-compose build
 Output documentation -- view output.py for 
-    Different output options: 
-    1. Statistics:
+    
+   Different output options: 
+    
+   1. Statistics:
         -- outputs various meaningful mathematical calculations of the data including averages, counts, etc.
-    2. All Phone Numbers
+    
+   2. All Phone Numbers
         -- outputs all phones numbers found and during what process
-    3. All Social Security Numbers
+    
+   3. All Social Security Numbers
          -- outputs all social security numbers found and during what process
-    4  All Emails
+    
+   4  All Emails
          -- outputs all emails found and during what process
-    5. All Keywords
+   
+   5. All Keywords
          -- outputs all keywords found and during what process
-    6. Machine-Readable:
+    
+   6. Machine-Readable:
         -- outputs a csv of the data
 
 
