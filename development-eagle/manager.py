@@ -38,7 +38,7 @@ def main():
     if args.p == True:
         parameters["phone"] = True
     else:
-        parameters["Phone"] = False
+        parameters["phone"] = False
 
     if args.s == True:
         parameters["social"] = True

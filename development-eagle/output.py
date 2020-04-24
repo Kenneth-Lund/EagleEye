@@ -7,6 +7,8 @@ the current OS deskptop directory.
 def output_data(db_connection):
 
     # How to clsoe db_connection: db_connection.close()
+
+    print("trying to query data")
     
     cursor = db_connection.cursor()
 
@@ -30,6 +32,8 @@ def output_data(db_connection):
         pdf.ln(row_height*spacing)
 
     pdf.output('EagleEyeDatabase.pdf')
+
+    print("DONE MAKING PDF")
 
     db_connection.commit()
     cursor.close()
