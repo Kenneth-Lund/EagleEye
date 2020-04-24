@@ -65,7 +65,7 @@ Output documentation -- view output.py for
    3. All Social Security Numbers
          -- outputs all social security numbers found and during what process
     
-   4  All Emails
+   4.  All Emails
          -- outputs all emails found and during what process
    
    5. All Keywords
