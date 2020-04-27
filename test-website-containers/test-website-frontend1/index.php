@@ -2,7 +2,6 @@
     <head>
         <title>Northrop Grumman Site 1</title>
         <script>
-            /*
             var i = 0;
 
             // update site content every second
@@ -18,7 +17,6 @@
                 myElement.innerHTML = 'Time visited: ' + i;
 
             }, 1000);
-            */
         </script>
     </head>
     <body>
@@ -43,5 +41,6 @@
         <h2>This user: user.name+tag+sorting@example.com contacted this email: tester04@gmail.com</h2>
         <h2>Employee ssn 111-11-0012 is relatives with this person havin ssn: 213-25-4000</h2>
         <h2>Reach Employee 0321 at 230-345-2145</h2>
+        <h2 id = 'test_count'> Time visited: 0</h2>
     </body>
 </html>

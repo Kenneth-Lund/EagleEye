@@ -23,6 +23,8 @@ def output_data(db_connection):
     pdf.set_font("Arial", size=8)
     pdf.add_page()
 
+    print(str(len(rows)))
+    
     spacing = 1    
     col_width = pdf.w / 7
     row_height = pdf.font_size
