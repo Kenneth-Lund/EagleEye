@@ -1,16 +1,46 @@
 .\" Manpage for eagle eye.
 .TH man 8 "31 March 2020" "1.0" "eagleeye man page"
 .SH NAME
-eagleeye \- website scrapping tool 
+.BR	eagleeye 
+\- website scrapping tool 
 .SH SYNOPSIS
-eagleeye [r]
+.BR	eagleeye 
+[
+.BR	-rpse
+]
+[url ...]
 .SH DESCRIPTION
 built primarily for government and private entities, EagleEye is a tool that can be used to identify sensitive content on websites.
 .SH OPTIONS
 the following options are available:
 .PP
-.B	-r	
+.B      --url
+the url to be scrapped
+.br
+.PP
+.B      -r
 search for sensitive output recursively
+.br
+.PP
+.B      --time 
+how long to search for dynamic changes 
+.br
+.PP
+.B	--keywords
+keywords/phrases to search for
+.br
+.PP
+.B	-p
+search for phone numbers only
+.br
+.PP
+.B	-s
+search for social security numbers only
+.br
+.PP
+.B	-e
+searcg for email addresses only
+.br
 .SH EXAMPLES
 .BR
 .SH AUTHORS
