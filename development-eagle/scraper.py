@@ -7,6 +7,11 @@ import datetime
 import re
 import output
 
+# utility function to remove html tags from page source
+def remove_html_tags(text):
+    clean = re.compile('<.*?>')
+    return re.sub(clean, '', text)
+
 # Scrapes our test website
 def scrape(parameters, db_connection):
 
@@ -68,7 +73,7 @@ def scrape_driver(current_url, parameters, url_visited, url_queue, db_connection
     driver.get(current_url)
 
     # Step 2. Scrape html from current driver before looking for any dynamic changes
-    original_html = driver.page_source
+    original_html = remove_html_tags(driver.page_source)
 
     original_soup = bs(original_html, "html.parser")
 
