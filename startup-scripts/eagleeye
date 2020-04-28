@@ -1,17 +1,2 @@
-.\" Manpage for eagle eye.
-.TH man 8 "31 March 2020" "1.0" "eagleeye man page"
-.SH NAME
-eagleeye \- website scrapping tool 
-.SH SYNOPSIS
-eagleeye [r]
-.SH DESCRIPTION
-built primarily for government and private entities, EagleEye is a tool that can be used to identify sensitive content on websites.
-.SH OPTIONS
-the following options are available:
-.PP
-.B	-r	
-search for sensitive output recursively
-.SH EXAMPLES
-.BR
-.SH AUTHORS
-Joel Eckles (jeckles7@umd.edu) | Kenneth Lund (kenlund04@gmail.com) | Morgan Castle (mcastle626@gmail.com)
+#!/bin/bash
+docker exec -it development_eagle python3 manager.py $@
