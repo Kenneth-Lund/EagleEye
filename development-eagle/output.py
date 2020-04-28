@@ -1,11 +1,16 @@
 import mysql.connector as connector
 from fpdf import FPDF
+import os
 '''
 Creates and saves a PDF to a directory within
 the current OS deskptop directory.
 '''
 def output_data(db_connection):
 
+    with open(os.path.join('./output', "test.txt"), "w") as f:
+        f.write("this is a test")
+
+    f.close()
     # How to clsoe db_connection: db_connection.close()
 
     print("trying to query data")
@@ -24,7 +29,7 @@ def output_data(db_connection):
     pdf.add_page()
 
     print(str(len(rows)))
-    
+
     spacing = 1    
     col_width = pdf.w / 7
     row_height = pdf.font_size
@@ -33,7 +38,7 @@ def output_data(db_connection):
             pdf.cell(col_width, row_height*spacing, txt=str(item), border=1)
         pdf.ln(row_height*spacing)
 
-    pdf.output('EagleEyeDatabase.pdf')
+    pdf.output(dest='S').encode('latin-1')
 
     print("DONE MAKING PDF")
 

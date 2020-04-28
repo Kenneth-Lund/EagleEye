@@ -1,5 +1,6 @@
 FROM python:3-onbuild
 COPY . /usr/src/app
+RUN mkdir -p /usr/src/app/output
 
 # install google chrome
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -

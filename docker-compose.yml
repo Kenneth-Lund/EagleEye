@@ -34,7 +34,8 @@ services:
         container_name: development_eagle
         command: tail -f /dev/null
         volumes:
-            - ./development-eagle:/user/src/app
+            - ./development-eagle:/usr/src/app
+            - /Users/kennethlund/Desktop:/usr/src/app/output
         ports:
             - 5005:80
         network_mode: host
