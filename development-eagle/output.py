@@ -1,47 +1,45 @@
 import mysql.connector as connector
-from fpdf import FPDF
+import datetime
 import os
+import pdfkit
 '''
 Creates and saves a PDF to a directory within
 the current OS deskptop directory.
 '''
 def output_data(db_connection):
 
-    with open(os.path.join('./output', "test.txt"), "w") as f:
-        f.write("this is a test")
+    # Create HTHML template string
+    title_html = '<html><body><h2>Eagle Eye</h2><p>Process 1' + str(datetime.datetime.now()) + '</p>'
 
-    f.close()
-    # How to clsoe db_connection: db_connection.close()
+    table_start_tag = '<table style="width:100%">'
 
+    table_headers_row = '<tr> <th>Type</th> <th>Value</th> <th>Source</th> <th>Time Found</th> </tr>'
+
+    table_end_tag='</table></body></html>'
+
+    html = title_html + table_start_tag + table_headers_row
+    
     print("trying to query data")
     
     cursor = db_connection.cursor()
 
     data = cursor.execute("SELECT * FROM data_table") 
     rows = cursor.fetchall()
-
-    # create PDF from queried data
-
-    print("trying to make a pdf now")
-
-    pdf = FPDF()
-    pdf.set_font("Arial", size=8)
-    pdf.add_page()
-
-    print(str(len(rows)))
-
-    spacing = 1    
-    col_width = pdf.w / 7
-    row_height = pdf.font_size
+   
     for row in rows:
-        for item in row:
-            pdf.cell(col_width, row_height*spacing, txt=str(item), border=1)
-        pdf.ln(row_height*spacing)
+        html_row = "<tr><td>" + str(row[3]) + "</td><td>" + str(row[2]) + "</td><td>" + str(row[4]) + "</td><td>" + str(row[5]) + "</td></tr>"
 
-    pdf.output(dest='S').encode('latin-1')
+        html = html + html_row
+        
+    html = html + table_end_tag
+
+    print("Trying to make PDF")
+    
+    pdfkit.from_string(html, os.path.join('./output', "test.pdf"))
 
     print("DONE MAKING PDF")
 
     db_connection.commit()
     cursor.close()
     db_connection.close()    
+    

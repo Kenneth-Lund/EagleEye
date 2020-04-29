@@ -15,3 +15,11 @@ RUN unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/
 
 # set display port to avoid crash
 ENV DISPLAY=:99
+
+# Install wkhtmltopdf for pdfkit
+RUN curl -Lo wk.tar.xz https://downloads.wkhtmltopdf.org/0.12/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz \
+    && tar xf wk.tar.xz \
+    && cp wkhtmltox/bin/wkhtmltopdf /usr/bin \
+    && cp wkhtmltox/bin/wkhtmltoimage /usr/bin \
+    && rm wk.tar.xz \
+    && rm -r wkhtmltox

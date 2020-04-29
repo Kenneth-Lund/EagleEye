@@ -1,5 +1,5 @@
 requests==2.23.0
 beautifulsoup4==4.8.2
 mysql-connector-python==8.0.19
-fpdf==1.7.2
 selenium==3.141.0
+pdfkit==0.6.1
