@@ -55,7 +55,7 @@ def scrape(parameters, db_connection):
     print("Done scraping")
 
     print("Calling output function for PDF gen")
-    output.output_data(db_connection)
+    output.output_data(parameters, db_connection)
         
 
 def scrape_driver(current_url, parameters, url_visited, url_queue, db_connection):

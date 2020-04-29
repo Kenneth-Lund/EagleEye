@@ -6,7 +6,7 @@ import pdfkit
 Creates and saves a PDF to a directory within
 the current OS deskptop directory.
 '''
-def output_data(db_connection):
+def output_data(parameters, db_connection):
 
     # Create HTHML template string
     title_html = '<html><body><h2>Eagle Eye</h2><p>Process 1' + str(datetime.datetime.now()) + '</p>'
@@ -34,8 +34,11 @@ def output_data(db_connection):
     html = html + table_end_tag
 
     print("Trying to make PDF")
-    
-    pdfkit.from_string(html, os.path.join('./output', "test.pdf"))
+
+    if parameters["filename"] is not None:
+        pdfkit.from_string(html, os.path.join('./output', parameters["filename"]))
+    else:
+        pdfkit.from_string(html, os.path.join('./output', "results.pdf"))
 
     print("DONE MAKING PDF")
 

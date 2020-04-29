@@ -9,6 +9,7 @@ def main():
 
     parser = argparse.ArgumentParser(description='parser for EagleEye')
     parser.add_argument('--url', action='store')
+    parser.add_argument('--filename', action='store')
 
     # Allocated time a website will be scraped for
     parser.add_argument('--time', action='store')
@@ -48,6 +49,7 @@ def main():
     parameters["time"] = args.time
     parameters["initial_url"] = args.url
     parameters["keywords"] = args.keywords
+    parameters["filename"] = args.filename
 
     start(parameters)
 
