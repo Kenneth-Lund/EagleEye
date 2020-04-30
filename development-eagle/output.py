@@ -8,8 +8,8 @@ import csv
 def default_output(parameters, db_connection):
     
     cursor = db_connection.cursor()
-
-    data = cursor.execute("SELECT * FROM data_table") 
+    
+    data = cursor.execute("SELECT * FROM data_table WHERE time_retrieved > '%s'" % (str(parameters["time_started"]))) 
     rows = cursor.fetchall()
     
     # Create PDF
@@ -28,10 +28,10 @@ def default_csv(rows, parameters):
 
     print("Creating CSV...")
 
-    filename = "results_default.csv"
+    filename = "default+" + str(parameters["time_started"]) + ".csv"
 
     if parameters["filename"] is not None:
-       filename = parameters["filename"] + "_default.csv"
+       filename = parameters["filename"] + "_default_" + str(parameters["time_started"]) + ".csv"
 
     with open(os.path.join('./output', filename), 'w') as csvfile:
 
@@ -69,9 +69,9 @@ def default_pdf(rows, parameters):
     html = html + table_end_tag
 
     if parameters["filename"] is not None:
-        pdfkit.from_string(html, os.path.join('./output', parameters["filename"] + '_default.pdf'))
+        pdfkit.from_string(html, os.path.join('./output', parameters["filename"] + '_default_' + str(parameters["time_started"]) + '.pdf'))
     else:
-        pdfkit.from_string(html, os.path.join('./output', "results_default.pdf"))
+        pdfkit.from_string(html, os.path.join('./output', "default_" + str(parameters["time_started"]) + ".pdf"))
 
 
 '''
