@@ -2,10 +2,12 @@ import requests
 import time
 import mysql.connector as connector
 from bs4 import BeautifulSoup as bs
+from bs4 import Comment
 from selenium import webdriver
 import datetime
 import re
 import output
+import urllib.parse as urlparse
 
 # utility function to remove html tags from page source
 def remove_html_tags(text):
@@ -54,7 +56,6 @@ def scrape(parameters, db_connection):
     # This is where output file gets called, pass the database connection here as well.
     print("Done scraping")
 
-    print("Calling output function for PDF gen")
     output.output_data(parameters, db_connection)
         
 
@@ -73,13 +74,13 @@ def scrape_driver(current_url, parameters, url_visited, url_queue, db_connection
     driver.get(current_url)
 
     # Step 2. Scrape html from current driver before looking for any dynamic changes
-    original_html = remove_html_tags(driver.page_source)
+    original_html = driver.page_source
 
     original_soup = bs(original_html, "html.parser")
 
-    scrape_html(current_url, parameters, original_soup, original_html, db_connection)
+    scrape_helper(current_url, parameters, original_soup, original_html, db_connection)
     
-    add_neighboring_pages(current_url, original_soup, url_visited, url_queue)
+    add_neighboring_pages(current_url, original_soup, url_visited, url_queue, parameters)
 
     # Step 3. Enter while loop and check for changes in HTML until time is up
     count = 0
@@ -95,9 +96,9 @@ def scrape_driver(current_url, parameters, url_visited, url_queue, db_connection
             # Step 4. Scrape the newly found dynamic data.
             new_soup = bs(newer_html, "html.parser")
             
-            scrape_html(current_url, parameters, new_soup, newer_html, db_connection)
+            scrape_helper(current_url, parameters, new_soup, newer_html, db_connection)
             
-            add_neighboring_pages(current_url, new_soup, url_visited, url_queue)
+            add_neighboring_pages(current_url, new_soup, url_visited, url_queue, parameters)
             
             original_html = newer_html
 
@@ -113,19 +114,25 @@ def scrape_driver(current_url, parameters, url_visited, url_queue, db_connection
 
 
 # Adds new urls that have not been visited before to the queue
-def add_neighboring_pages(current_url, soup_html, url_visited, url_queue):
+def add_neighboring_pages(current_url, soup_html, url_visited, url_queue, parameters):
     
     linked_urls = find_neighboring_pages(current_url, soup_html)
 
     # Update url_queue if any additional neighboring websites are found
     for url in linked_urls:
-
+        
+        # Make sure url matches domain currently visiting
         if url not in url_visited:
             
-            print("Found new url at: " + current_url)
+            domain = urlparse.urlparse(url).netloc
 
-            url_queue.append(url)
-            url_visited.append(url)
+            # Check if domain pattern matches found URL
+            if domain == parameters["domain"] or domain.split(':')[:1] == parameters["domain"]:
+                
+                print("Found new url at: " + current_url)
+
+                url_queue.append(url)
+                url_visited.append(url)
 
 
 # Finds all embedded urls within an HTML page
@@ -140,59 +147,76 @@ def find_neighboring_pages(current_url, soup_html):
     
     return found_urls
 
+# Helper function used to call text extractor for the current page
+def scrape_helper(current_url, parameters, soup, html, db_connection):
 
-def scrape_html(current_url, parameters, soup_html, newer_html, db_connection):
+    # 1. Scrape and clean comments from soup
+    comments = soup.find_all(text=lambda text: isinstance(text, Comment))
+
+    for comment in comments:
+
+        text_extractor(current_url, parameters, comment, db_connection)
+        comment.extract()
+    
+    # 2. Scrape
+
+    text = remove_html_tags(html)
+    text_extractor(current_url, parameters, text, db_connection)
+
+
+
+def text_extractor(current_url, parameters, text, db_connection):
 
     for keyword in parameters['keywords']:
-        find_keyword(current_url, keyword, newer_html, db_connection)
+        find_keyword(current_url, keyword, text, db_connection, parameters)
 
     if parameters['phone']:
-        find_phone(current_url, newer_html, db_connection)
+        find_phone(current_url, text, db_connection, parameters)
 
     if parameters['social']:
-        find_social(current_url, newer_html, db_connection)
+        find_social(current_url, text, db_connection, parameters)
 
     if parameters['email']:
-        find_email(current_url, newer_html, db_connection)
+        find_email(current_url, text, db_connection, parameters)
 
 
-def find_keyword(current_url, keyword, newer_html, db_connection):
+def find_keyword(current_url, keyword, text, db_connection, parameters):
 
     # ignore case sensitive
-    if keyword.lower() in newer_html.lower():
+    for i in re.finditer(keyword.lower(), text.lower()):
 
-        data_insertion_helper(current_url, [keyword], "KEYWORD", db_connection)
+        data_insertion_helper(current_url, [keyword], "KEYWORD", db_connection, parameters)
 
 
-def find_social(current_url, newer_html, db_connection):
+def find_social(current_url, text, db_connection, parameters):
 
-    socials = re.findall(r'\b(?!000|.+0{4})(?:\d{9}|\d{3}-\d{2}-\d{4})\b', newer_html)
+    socials = re.findall(r'(?!219-09-9999|078-05-1120)(?!666|000|9\d{2})\d{3}-(?!00)\d{2}-(?!0{4})\d{4}', text)
 
     if len(socials) > 0:
 
-        data_insertion_helper(current_url, socials, "SSN", db_connection)
+        data_insertion_helper(current_url, socials, "SSN", db_connection, parameters)
    
 
-def find_phone(current_url, newer_html, db_connection):
+def find_phone(current_url, text, db_connection, parameters):
 
-    phone_numbers = re.findall(r'\d{3}[-\.\s]??\d{3}[-\.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-\.\s]??\d{4}|\d{3}[-\.\s]??\d{4}', newer_html)
+    phone_numbers = re.findall(r'\d{3}[-\.\s]??\d{3}[-\.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-\.\s]??\d{4}|\d{3}[-\.\s]??\d{4}', text)
   
     if len(phone_numbers) > 0:
 
-        data_insertion_helper(current_url, phone_numbers, "Phone", db_connection)
+        data_insertion_helper(current_url, phone_numbers, "Phone", db_connection, parameters)
 
-def find_email(current_url, newer_html, db_connection):
+def find_email(current_url, text, db_connection, parameters):
 
-    emails = re.findall(r'[a-zA-Z0-9+._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+', newer_html)
+    emails = re.findall(r'[a-zA-Z0-9+._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+', text)
 
     if len(emails) > 0:
 
-        data_insertion_helper(current_url, emails, "Email", db_connection)
+        data_insertion_helper(current_url, emails, "Email", db_connection, parameters)
 
 
 
 # Creates a data dictionary for inserting into database  
-def data_insertion_helper(current_url, value_list, value_type, db_connection):
+def data_insertion_helper(current_url, value_list, value_type, db_connection, parameters):
 
     for value in value_list:
         
@@ -202,26 +226,28 @@ def data_insertion_helper(current_url, value_list, value_type, db_connection):
             'type': value_type
         }
 
-        database_insert(data, db_connection)
+        database_insert(data, db_connection, parameters)
 
             
-def database_insert(data, db_connection):
+def database_insert(data, db_connection, parameters):
     try:
         cursor = db_connection.cursor()
         
         now = datetime.datetime.now()
 
-        cursor.execute("INSERT INTO data_table(process_id, data_value, data_type, data_source, time_retrieved) values(%s, %s, %s, %s, %s)",
-                   ("417", data['value'], data['type'], data['source'], now))
-        
+        cursor.execute("INSERT INTO data_table(data_value, data_type, data_source, time_retrieved) values(%s, %s, %s, %s)",
+                   (data['value'], data['type'], data['source'], now))
+
+        cursor.execute("INSERT INTO processes(process_id, data_id, time_started) values(%s, %s, %s)",
+                    (parameters['process_id'], cursor.lastrowid, parameters['time_started']))        
         
         db_connection.commit()
 
         cursor.close()
 
         print("DATA FOUND... inserting into DB.")
-    except:
-        print("data was found... but insertion failed")
+    except Exception as e:
+        print("data was found... but insertion failed" + str(e))
     
     
     

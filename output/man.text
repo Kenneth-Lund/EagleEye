@@ -2,6 +2,20 @@
 
 Options:
 
-    -r: recursive
-    -a: accept [take in arguements... etc]
-    -s: search
+    Required Arguements:
+
+    --url:          Initial URL
+    --time:         Takes in an a [number in sconds] Max amount of time to check a website for changes
+
+    
+    Optional Arguements:
+
+    -r:             Recursive website scraping, finds hidden URLs to potentially scrape
+
+    -e:             Search for emails
+    -p:             Search for phone numbers
+    -s:             Search for social security numbers
+
+    --keywords:     Search for certain pattern/keyword
+
+   

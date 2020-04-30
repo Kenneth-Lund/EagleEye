@@ -1,6 +1,9 @@
 import scraper
 import argparse
+import urllib.parse as urlparse
 import time
+import datetime
+import random
 import mysql.connector as connector
 
 def main():
@@ -23,35 +26,51 @@ def main():
     parser.add_argument('-s', action='store_true') 
     parser.add_argument('-e', action='store_true') 
 
-    # parse arguments
+    # Parse user arguements for scraping
     args = parser.parse_args()
 
-    if args.r == True:
-        parameters["max_level"] = 10000
+    if args.url is None or args.time is None:
+        
+        print("--url or --time arguement not passed")
     else:
-        parameters["max_level"] = 1
+        if args.r == True:
+            parameters["max_level"] = 10000
+        else:
+            parameters["max_level"] = 1
 
-    if args.e == True:
-        parameters["email"] = True
-    else:
-        parameters["email"] = False
+        if args.e == True:
+            parameters["email"] = True
+        else:
+            parameters["email"] = False
 
-    if args.p == True:
-        parameters["phone"] = True
-    else:
-        parameters["phone"] = False
+        if args.p == True:
+            parameters["phone"] = True
+        else:
+            parameters["phone"] = False
 
-    if args.s == True:
-        parameters["social"] = True
-    else:
-        parameters["social"] = False
-    
-    parameters["time"] = args.time
-    parameters["initial_url"] = args.url
-    parameters["keywords"] = args.keywords
-    parameters["filename"] = args.filename
+        if args.s == True:
+            parameters["social"] = True
+        else:
+            parameters["social"] = False
+        
+        parameters["time"] = args.time
+        parameters["initial_url"] = args.url
+        parameters["keywords"] = args.keywords
+        parameters["filename"] = args.filename
+        
+        # Create unique process ID and time started parameters here
+        parameters["process_id"] = createRandomID()
+        parameters["time_started"] = datetime.datetime.now()
 
-    start(parameters)
+        # Add initial URL domain to parameters to avoid scraping unknown websites
+        domain = str(urlparse.urlparse(args.url).netloc)
+
+        if ":" in domain:
+            parameters["domain"] = domain.split(':')[:1]
+        else:
+            parameters["domain"] = domain
+
+        start(parameters)
 
 # Recursively calls database until it is ready
 def start(parameters):
@@ -60,13 +79,17 @@ def start(parameters):
         db_connection = connector.connect(user='test', password='test', host='localhost', database='EAGLEEYE')
 
         scraper.scrape(parameters, db_connection)
-
-        db_connection.close()
     except:
 
         time.sleep(5)
         print("Database down, trying to connect...")
         start(parameters)
+
+# Generates a random 4 digit number
+def createRandomID():
+
+    return str(random.randint(0, 9)) + str(random.randint(0, 9)) + str(random.randint(0, 9)) + str(random.randint(0, 9)) + str(random.randint(0, 9))
+
 
 
 if __name__ == "__main__":
