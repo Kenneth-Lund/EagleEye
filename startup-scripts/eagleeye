@@ -1,2 +1,10 @@
-#!/bin/bash
-docker exec -it development_eagle python3 manager.py $@
+while test $# -gt 0
+do
+    case "$1" in
+        -h) man ./egleyedocs
+            ;;
+        *) docker exec -it development_eagle python3 manager.py $@ 
+            ;;
+    esac
+    shift
+done
