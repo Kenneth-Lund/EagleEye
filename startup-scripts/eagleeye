@@ -1,7 +1,7 @@
 while test $# -gt 0
 do
     case "$1" in
-        -h) man ./egleyedocs
+        --help) man ./egleyedocs
             ;;
         *) docker exec -it development_eagle python3 manager.py $@ 
             ;;
