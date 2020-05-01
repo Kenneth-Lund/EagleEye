@@ -1,9 +1,5 @@
-while test $# -gt 0
-do
-    case "$1" in
-        --help) man `pwd`/egleyedocs ; exit 0
-            ;;
-    esac
-    shift
-done
-docker exec -it development_eagle python3 manager.py $@
+if [ $1 == "--help" ]; then 
+    man `pwd`/egleyedocs
+else
+    docker exec -it development_eagle python3 manager.py $@
+fi
