@@ -7,7 +7,7 @@ The goal of the project is to develop a tool to help government entities and pri
 Utilize multiple technologies to build an application that is compatible with the Linux operating system  
 Utilize predefined user data queries (phone number, email addresses, etc.) to extract relevant information
 
-Instructions for developers:
+Installing EagleEye:
 
     - first, clone this repository by running git clone https://github.com/Kenneth-Lund/EagleEye.git
     - cd in startup-scripts directory and run the install script with ./install.sh
