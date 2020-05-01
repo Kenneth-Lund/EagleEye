@@ -46,6 +46,7 @@ search for social security numbers only
 search for email addresses only
 .br
 .SH EXAMPLES
+eagleeye --url "https://examplewebsite.com" --keywords "John Smith" --filename "output"
 .BR
 .SH AUTHORS
 Joel Eckles (jeckles7@umd.edu) | Kenneth Lund | Morgan Castle (mcastle626@gmail.com)
