@@ -12,16 +12,22 @@ def main():
 
     parser = argparse.ArgumentParser(description='parser for EagleEye')
     parser.add_argument('--url', action='store')
+
+    # Filename arguement, creates tag for output files
     parser.add_argument('--filename', action='store')
+
+    # Output arguement, for different kinds of output
+    parser.add_argument('--output', nargs = '+', default =[])
 
     # Allocated time a website will be scraped for
     parser.add_argument('--time', action='store')
 
     parser.add_argument('--keywords', nargs = '+', default =[])
     
-    # store_true will set default to false. if -r is specified, default will change to true
+    # Recursive arguement
     parser.add_argument('-r', action='store_true') 
 
+    # Scraping priority arguements (s SSN, p Phone, e Email)
     parser.add_argument('-p', action='store_true') 
     parser.add_argument('-s', action='store_true') 
     parser.add_argument('-e', action='store_true') 
@@ -29,10 +35,8 @@ def main():
     # Parse user arguements for scraping
     args = parser.parse_args()
 
-    if args.url is None or args.time is None:
+    if validate_arguements(args):
         
-        print("--url or --time arguement not passed")
-    else:
         if args.r == True:
             parameters["max_level"] = 10000
         else:
@@ -70,6 +74,29 @@ def main():
         else:
             parameters["domain"] = domain
 
+        
+        # Add output arguements
+        parameters["detail"] = []
+        parameters["stat"] = False
+
+        for arg in args.output:
+
+            # NOTE: Case sensitive values for these keys
+            if arg.lower() == "phone":
+                parameters["detail"].append("Phone")
+            
+            if arg.lower() == "ssn":
+                parameters["detail"].append("SSN")
+
+            if arg.lower() == "email":
+                parameters["detail"].append('Email')
+
+            if arg.lower() == "keyword":
+                parameters["detail"].append('KEYWORD')
+            
+            if arg.lower() == "stat":
+                parameters["stat"] = True
+
         start(parameters)
 
 # Recursively calls database until it is ready
@@ -84,6 +111,28 @@ def start(parameters):
         time.sleep(5)
         print("Database down, trying to connect...")
         start(parameters)
+
+
+def validate_arguements(args):
+
+    if args.url is None:
+        print("No url arguement is given. Please try again.")
+        return False
+    if args.time is None:
+        print("No time arguement is given. Please try again.")
+        return False
+    if len(args.output) > 6:
+        print("Too many arguements given for statistics.")
+        return False
+    for arg in args.output:
+        print(arg)
+        if arg.lower() == "stat" or arg.lower() == "phone" or arg.lower() == "ssn" or arg.lower() == "email" or arg.lower() == "keyword":
+            pass
+        else:
+            print(arg + " does not exist for the output arguement. Please try: stat, keyword, phone, ssn, or email")
+            return False
+
+    return True
 
 # Generates a random 4 digit number
 def createRandomID():

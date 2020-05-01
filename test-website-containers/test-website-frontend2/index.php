@@ -4,7 +4,10 @@
     </head>
 
     <body>
-        <h1>If you are on this site, you have reached a second secret site.</h1>
+        <!-- Hello there, this is a test. (324)-324-2324 -->
+        <img src="./pictures/logo.png" style="width:350px;height:150px;">
+        <h1>Test Website 2</h1>
+        <h2>If you are on this site, you have reached the second test website.</h2>
         <ul>
             <?php
 
