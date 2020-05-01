@@ -9,11 +9,9 @@ Utilize predefined user data queries (phone number, email addresses, etc.) to ex
 
 Instructions for developers:
 
-    - ./startup-scripts/start.sh --url http://127.0.0.1:5000 --time 5 --keywords Username
-
-    - url: initial url
-    - time: max time to check a webpage for changes
-    - keywords: a list of keywords you want to search for
+    - first, clone this repository by running git clone https://github.com/Kenneth-Lund/EagleEye.git
+    - cd in startup-scripts directory and run the install script with ./install.sh
+    - run command eagleeye --help for information on how to use the tool with various options
     
 Docker Command Shortcuts:
 
@@ -73,6 +71,4 @@ Output documentation -- view output.py for
     
    6. Machine-Readable:
         -- outputs a csv of the data
-
-
 
