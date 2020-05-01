@@ -18,6 +18,10 @@ the following options are available:
 the url to be scrapped
 .br
 .PP
+.B      --filename
+specify the name of the output file
+.br
+.PP
 .B      -r
 search for sensitive output recursively
 .br
