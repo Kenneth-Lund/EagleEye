@@ -7,6 +7,9 @@ The goal of the project is to develop a tool to help government entities and pri
 Utilize multiple technologies to build an application that is compatible with the Linux operating system  
 Utilize predefined user data queries (phone number, email addresses, etc.) to extract relevant information
 
+User manual for more in depth instructions:
+https://docs.google.com/document/d/12l5B2nyn67PDPkDO3A-tNIlOt4VXZVn_eDoi871lVxg/edit
+
 Installing EagleEye:
 
     - first, clone this repository by running git clone https://github.com/Kenneth-Lund/EagleEye.git
@@ -50,8 +53,8 @@ Debugging documentation:
     3. Rebuilding the containers:
 
         docker-compose build
-Output documentation -- view output.py for 
-    
+Output documentation 
+
    Different output options: 
     
    1. Statistics:
