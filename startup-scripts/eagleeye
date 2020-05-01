@@ -1,5 +1,5 @@
 if [ $1 == "--help" ]; then 
-    man `pwd`/egleyedocs
+    man /Users/kennethlund/Desktop/EAGLE_EYE/EagleEye/startup-scripts
 else
     docker exec -it development_eagle python3 manager.py $@
 fi
