@@ -8,7 +8,7 @@ Utilize multiple technologies to build an application that is compatible with th
 Utilize predefined user data queries (phone number, email addresses, etc.) to extract relevant information
 
 User manual for more in depth instructions:
-https://docs.google.com/document/d/12l5B2nyn67PDPkDO3A-tNIlOt4VXZVn_eDoi871lVxg/edit
+https://docs.google.com/document/d/12l5B2nyn67PDPkDO3A-tNIlOt4VXZVn_eDoi871lVxg/edit?usp=sharing
 
 Installing EagleEye:
 
