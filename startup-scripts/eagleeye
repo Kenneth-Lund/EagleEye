@@ -6,3 +6,4 @@ do
     esac
     shift
 done
+docker exec -it development_eagle python3 manager.py $@
