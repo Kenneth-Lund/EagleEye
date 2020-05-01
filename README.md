@@ -10,7 +10,7 @@ Utilize predefined user data queries (phone number, email addresses, etc.) to ex
 Installing EagleEye:
 
     - first, clone this repository by running git clone https://github.com/Kenneth-Lund/EagleEye.git
-    - cd in startup-scripts directory and run the install script with ./install.sh
+    - cd in startup-scripts directory and run the install script with 'sh install.sh'
     - run command eagleeye --help for information on how to use the tool with various options
     
 Docker Command Shortcuts:
