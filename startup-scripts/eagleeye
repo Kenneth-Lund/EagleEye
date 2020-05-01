@@ -1,9 +1,7 @@
 while test $# -gt 0
 do
     case "$1" in
-        --help) man `pwd`/egleyedocs
-            ;;
-        *) docker exec -it development_eagle python3 manager.py $@ 
+        --help) man `pwd`/egleyedocs ; exit 0
             ;;
     esac
     shift
